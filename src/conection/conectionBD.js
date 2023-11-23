@@ -12,7 +12,7 @@ mongoose.connect(process.env.CONECTIONSTRING )  // não precisso mais disso apos
             } )
             .catch( (err)=> { 
               console.log(err);
-              if(err) throw err;
+              throw err;
             });
 
 module.exports = { app, mongoose, express }

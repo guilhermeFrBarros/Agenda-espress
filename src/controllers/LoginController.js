@@ -10,7 +10,12 @@ exports.index = (req, res) => {
 exports.register = async function (req, res) {
   try {
     const login = new Login(req.body);
-    await login.register();
+    try {
+      await login.register();
+      
+    } catch (error) {
+      console.log(error)
+    }
 
     if (login.errors.length > 0) {
       console.log(login.errors.length);

@@ -1,5 +1,6 @@
 const { mongoose } = require("../conection/conectionBD");
 const validator = require("validator");
+const bcryptjs = require("bcryptjs");
 
 const LoginSchema = new mongoose.Schema({
     email: { type: String, required: true },
@@ -19,7 +20,18 @@ class Login {
     async register() {
         this.valida();
         if ( this.errors.length > 0 )  return;
+
+        const userExist = await this.userExists();
+        if ( userExist || this.errors.length > 0 )  return;
+        // if ( this.errors.length > 0 )  throw new Error('Validation failed');
+
+
         try {
+            // Criando senha hash
+            const salt =  bcryptjs.genSaltSync();
+            this.body.password = bcryptjs.hashSync( this.body.password, salt );
+
+            // criando usaurio no banco
             this.user =  await LoginModel.create( this.body );
         } catch (error) {
             if( error ) throw error;
@@ -28,7 +40,7 @@ class Login {
 
     valida() {
         this.cleanUp();
-        console.log("chamou valida")
+        
 
         //validação
         //validação do email
@@ -47,11 +59,17 @@ class Login {
                 this.body[key] = '';
             }
         }
+
         this.body = {
             email: this.body.email,
             password: this.body.password
         };
-        console.log("fim do cleanUp")
+    }
+
+    async userExists() {
+        const user = await LoginModel.findOne({ email: this.body.email });
+
+        if ( user )  this.errors.push('usuario ja cadastrado');
     }
 
 }
