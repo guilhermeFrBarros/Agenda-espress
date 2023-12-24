@@ -6,4 +6,5 @@ exports.index = (req, res) => {
     titulo: 'Este será o título da página'
    });
   return;
+  
 };
